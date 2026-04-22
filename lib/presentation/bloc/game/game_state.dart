@@ -1,11 +1,42 @@
-abstract class GameState {}
+part of 'game_bloc.dart';
 
-class GameInitial extends GameState {}
+abstract class GameState extends Equatable {}
 
-class GameLoading extends GameState {}
+class GameInitial extends GameState {
+  @override
+  List<Object?> get props => [];
+}
+
+class GameLoading extends GameState {
+  @override
+  List<Object?> get props => [];
+}
 
 class GameLoaded extends GameState {
-  final List<Map<String, dynamic>> games;
+  final List<AppGame> games;
 
   GameLoaded({required this.games});
+
+  @override
+  List<Object?> get props => [games];
+}
+
+class GameError extends GameState {
+  final String message;
+  GameError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class GameNavigate extends GameState {
+  final GameModel marketGame;
+  final AppGame playType;
+
+  GameNavigate({
+    required this.marketGame,
+    required this.playType,
+  });
+  @override
+  List<Object?> get props => [marketGame, playType];
 }

@@ -1,4 +1,4 @@
 enum Environment {
   uat,
-  live,
+  prod,
 }

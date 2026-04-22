@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:matka_dev/core/utils/launcher_utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/colors.dart';
 import '../bloc/auth/auth_bloc.dart';
 
@@ -15,133 +17,237 @@ class _SignupScreenState extends State<SignupScreen> {
   final nameController = TextEditingController();
   final mobileController = TextEditingController();
   final passwordController = TextEditingController();
-  final pinController = TextEditingController();
   bool obscurePassword = true;
+
+  String adminNumber = "+917229955541";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocalAdminNumber();
+  }
+
+  Future<void> _loadLocalAdminNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedNumber = prefs.getString('whatsapp_admin');
+    if (savedNumber != null) {
+      setState(() => adminNumber = savedNumber);
+    }
+  }
+
+  void _openWhatsApp() {
+    LauncherUtils.openUrl("https://wa.me/$adminNumber");
+  }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
+    final h = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is SignupSuccess) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.pushReplacementNamed(context, '/login');
+          }
+          if (state is AuthFailure) {
             ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+                .showSnackBar(SnackBar(content: Text(state.error)));
           }
         },
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Gradient Header
+              /// 🔷 HEADER
               Container(
+                height: h * 0.24,
                 width: double.infinity,
-                height: screenHeight * 0.22,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
                     colors: [kPrimaryLightColor, kPrimaryColor],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(40),
+                    bottom: Radius.circular(w * 0.14),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: kPrimaryColor.withOpacity(0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.star, color: Colors.white, size: 50),
-                      SizedBox(height: 10),
-                      Text(
-                        "MATKA DEV",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.person_add_alt_1,
+                        color: Colors.white, size: w * 0.14),
+                    SizedBox(height: h * 0.015),
+                    Text(
+                      "MATKA DEV",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: w * 0.055,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      "Create your new account",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
+
+              SizedBox(height: h * 0.04),
+
+              /// 🔷 FORM CARD
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "Create A NEW ACCOUNT",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildInputField(
-                        Icons.person, "Enter your name", nameController),
-                    const SizedBox(height: 15),
-                    _buildInputField(Icons.phone, "Enter your mobile number",
-                        mobileController,
-                        keyboard: TextInputType.phone),
-                    const SizedBox(height: 15),
-                    _buildPasswordField(passwordController, "Password"),
-                    const SizedBox(height: 15),
-                    _buildInputField(
-                        Icons.lock_outline, "Enter PIN", pinController,
-                        obscure: true),
-                    const SizedBox(height: 25),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      onPressed: () {
-                        context.read<AuthBloc>().add(SignupSubmitted());
-                      },
-                      child: const Text(
-                        "SIGNUP",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                padding: EdgeInsets.symmetric(horizontal: w * 0.07),
+                child: Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(w * 0.06),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text("Already have an account? "),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/login');
-                          },
-                          child: const Text(
-                            "LOGIN",
-                            style: TextStyle(color: kPrimaryColor),
+                        Text(
+                          "Signup",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: w * 0.045,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Fill the details below to continue",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+
+                        SizedBox(height: h * 0.035),
+
+                        _inputField(
+                            Icons.person, "Full Name", nameController, w),
+                        SizedBox(height: h * 0.02),
+
+                        _inputField(Icons.phone_android, "Mobile Number",
+                            mobileController, w,
+                            keyboard: TextInputType.phone),
+                        SizedBox(height: h * 0.02),
+
+                        _passwordField(passwordController, w),
+
+                        SizedBox(height: h * 0.035),
+
+                        /// 🔹 SIGNUP BUTTON
+                        BlocBuilder<AuthBloc, AuthState>(
+                            builder: (context, state) {
+                          final isLoading = state is AuthLoading;
+                          return ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () {
+                                    context.read<AuthBloc>().add(
+                                          SignupSubmitted(
+                                            name: nameController.text,
+                                            mobile: mobileController.text,
+                                            password: passwordController.text,
+                                          ),
+                                        );
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: kPrimaryColor,
+                              padding:
+                                  EdgeInsets.symmetric(vertical: h * 0.022),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(w * 0.08),
+                              ),
+                            ),
+                            child: isLoading
+                                ? SizedBox(
+                                    height: h * 0.025,
+                                    width: h * 0.025,
+                                    child: const CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.black),
+                                    ),
+                                  )
+                                : const Text(
+                                    "SIGN UP",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                          );
+                        }),
+
+                        SizedBox(height: h * 0.025),
+
+                        /// 🔹 LOGIN LINK
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account? "),
+                            GestureDetector(
+                              onTap: () => Navigator.pushReplacementNamed(
+                                  context, '/login'),
+                              child: const Text(
+                                "LOGIN",
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: h * 0.025),
+
+                        /// 🔹 WHATSAPP ADMIN
+                        OutlinedButton.icon(
+                          onPressed: _openWhatsApp,
+                          icon: const FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            color: Colors.green,
+                          ),
+                          label: const Text(
+                            "Contact Admin",
+                            style: TextStyle(color: Colors.green),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.green),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(w * 0.08),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: h * 0.018,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.center, // center horizontally
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const FaIcon(FontAwesomeIcons.whatsapp,
-                            color: Colors.white),
-                        label: const Text("ADMIN",
-                            style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          minimumSize:
-                              const Size(0, 0), // allows button to shrink
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -151,12 +257,15 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildInputField(
-      IconData icon, String hint, TextEditingController controller,
-      {bool obscure = false, TextInputType keyboard = TextInputType.text}) {
+  Widget _inputField(
+    IconData icon,
+    String hint,
+    TextEditingController controller,
+    double w, {
+    TextInputType keyboard = TextInputType.text,
+  }) {
     return TextField(
       controller: controller,
-      obscureText: obscure,
       keyboardType: keyboard,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: kPrimaryColor),
@@ -164,24 +273,25 @@ class _SignupScreenState extends State<SignupScreen> {
         filled: true,
         fillColor: kTextFieldBg,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(w * 0.08),
           borderSide: BorderSide.none,
         ),
       ),
     );
   }
 
-  Widget _buildPasswordField(TextEditingController controller, String hint) {
+  Widget _passwordField(TextEditingController controller, double w) {
     return TextField(
       controller: controller,
       obscureText: obscurePassword,
+      keyboardType: TextInputType.number,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.lock, color: kPrimaryColor),
-        hintText: hint,
+        hintText: "Password",
         filled: true,
         fillColor: kTextFieldBg,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(w * 0.08),
           borderSide: BorderSide.none,
         ),
         suffixIcon: IconButton(
@@ -190,9 +300,7 @@ class _SignupScreenState extends State<SignupScreen> {
             color: kPrimaryColor,
           ),
           onPressed: () {
-            setState(() {
-              obscurePassword = !obscurePassword;
-            });
+            setState(() => obscurePassword = !obscurePassword);
           },
         ),
       ),

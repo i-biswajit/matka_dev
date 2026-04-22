@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -55,7 +57,8 @@ class _PinScreenState extends State<PinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final h = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
 
     return WillPopScope(
       onWillPop: () async {
@@ -82,66 +85,68 @@ class _PinScreenState extends State<PinScreen> {
                 /// 🔥 GRADIENT HEADER
                 Container(
                   width: double.infinity,
-                  height: screenHeight * 0.22,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
+                  height: h * 0.25,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
                       colors: [kPrimaryLightColor, kPrimaryColor],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(40),
+                      bottom: Radius.circular(w * 0.12),
                     ),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.lock, color: Colors.white, size: 50),
-                        SizedBox(height: 10),
+                        Icon(Icons.lock, color: Colors.white, size: w * 0.12),
+                        SizedBox(height: h * 0.035),
                         Text(
                           "Provide Security PIN",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: TextStyle(
+                              color: Colors.white, fontSize: w * 0.045),
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                SizedBox(height: h * 0.05),
 
                 /// 🔢 PIN BOXES
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(4, (index) {
                     return Container(
-                      margin: const EdgeInsets.all(8),
-                      width: 50,
-                      height: 50,
+                      margin: EdgeInsets.all(w * 0.02),
+                      width: w * 0.12,
+                      height: w * 0.12,
                       decoration: BoxDecoration(
-                        border: Border.all(color: kPrimaryColor, width: 2),
-                        borderRadius: BorderRadius.circular(8),
+                        border:
+                            Border.all(color: kPrimaryColor, width: w * 0.005),
+                        borderRadius: BorderRadius.circular(w * 0.025),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         pin[index].isEmpty ? '' : '•',
-                        style: const TextStyle(fontSize: 24),
+                        style: TextStyle(fontSize: w * 0.055),
                       ),
                     );
                   }),
                 ),
 
-                const SizedBox(height: 40),
+                SizedBox(height: h * 0.03),
 
                 /// 🔢 NUMERIC KEYPAD (3 per row)
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 60),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, // 👈 3 buttons per row
-                    crossAxisSpacing: 30,
-                    mainAxisSpacing: 30,
+                  padding: EdgeInsets.symmetric(horizontal: w * 0.14),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: w * 0.07,
+                    mainAxisSpacing: h * 0.035,
                   ),
                   itemCount: 12,
                   itemBuilder: (context, index) {
@@ -168,20 +173,20 @@ class _PinScreenState extends State<PinScreen> {
                         }
                       },
                       child: CircleAvatar(
-                        radius: 30,
+                        radius: w * 0.075,
                         backgroundColor:
                             label == 'Del' ? Colors.red : kPrimaryColor,
                         child: label == 'reset'
-                            ? const Icon(Icons.refresh,
-                                color: Colors.white, size: 24)
+                            ? Icon(Icons.refresh,
+                                color: Colors.white, size: w * 0.055)
                             : label == 'del'
-                                ? const Icon(Icons.backspace,
-                                    color: Colors.white, size: 22)
+                                ? Icon(Icons.backspace,
+                                    color: Colors.white, size: w * 0.055)
                                 : Text(
                                     label,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 18,
+                                      fontSize: w * 0.045,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -195,10 +200,10 @@ class _PinScreenState extends State<PinScreen> {
                 /// 🟢 ADMIN BUTTON
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: const FaIcon(
+                  icon: FaIcon(
                     FontAwesomeIcons.whatsapp,
                     color: Colors.white,
-                    size: 18,
+                    size: w * 0.05,
                   ),
                   label: const Text(
                     "ADMIN",
@@ -207,10 +212,10 @@ class _PinScreenState extends State<PinScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(w * 0.08),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: w * 0.08, vertical: h * 0.02),
                   ),
                 ),
 

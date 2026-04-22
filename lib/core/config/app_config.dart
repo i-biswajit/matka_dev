@@ -3,14 +3,22 @@ import 'environment.dart';
 
 class AppConfig extends InheritedWidget {
   final Environment environment;
-  final String baseUrl;
 
   const AppConfig({
     super.key,
     required this.environment,
-    required this.baseUrl,
     required super.child,
   });
+
+  String get baseUrl {
+    switch (environment) {
+      case Environment.prod:
+        return "https://matkadev.com/public/api";
+      case Environment.uat:
+      default:
+        return "https://matkadev.technoscend.com/public/api";
+    }
+  }
 
   static AppConfig of(BuildContext context) {
     final AppConfig? result =
@@ -21,5 +29,5 @@ class AppConfig extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AppConfig oldWidget) =>
-      environment != oldWidget.environment || baseUrl != oldWidget.baseUrl;
+      environment != oldWidget.environment;
 }

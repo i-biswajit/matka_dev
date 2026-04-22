@@ -15,13 +15,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final w = MediaQuery.of(context).size.width;
+    final h = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+          if (state is LoginSuccess) {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text(state.message)));
           }
@@ -29,87 +30,138 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Gradient Header
+              /// 🔷 HEADER
               Container(
+                height: h * 0.28,
                 width: double.infinity,
-                height: screenHeight * 0.22,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
                     colors: [kPrimaryLightColor, kPrimaryColor],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(40),
+                    bottom: Radius.circular(w * 0.14),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: kPrimaryColor.withOpacity(0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.lock_outline, color: Colors.white, size: 50),
-                      SizedBox(height: 10),
-                      Text(
-                        "MATKA DEV",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.lock_reset, color: Colors.white, size: 56),
+                    SizedBox(height: h * 0.015),
+                    Text(
+                      "MATKA DEV",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: w * 0.055,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      "Reset your password",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
+
+              SizedBox(height: h * 0.04),
+
+              /// 🔷 CARD
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      "FORGOT PASSWORD",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Mobile Number Input
-                    _buildInputField(Icons.phone, "Enter your mobile number",
-                        mobileController,
-                        keyboard: TextInputType.phone),
-                    const SizedBox(height: 25),
-
-                    // Send OTP Button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kPrimaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
-                      ),
-                      onPressed: () {
-                        context.read<AuthBloc>().add(SendOtp());
-                      },
-                      child: const Text("Send OTP",
-                          style: TextStyle(color: Colors.black)),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Back to Login
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                padding: EdgeInsets.symmetric(horizontal: w * 0.07),
+                child: Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(w * 0.06),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const Text("Remember Password? "),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/login');
-                          },
-                          child: const Text(
-                            "LOGIN",
-                            style: TextStyle(color: kPrimaryColor),
+                        Text(
+                          "Forgot Password",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: w * 0.045,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Enter your registered mobile number to receive OTP",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+
+                        SizedBox(height: h * 0.035),
+
+                        /// 📱 MOBILE INPUT
+                        _buildInputField(
+                          Icons.phone_android,
+                          "Mobile Number",
+                          mobileController,
+                          w,
+                          keyboard: TextInputType.phone,
+                        ),
+
+                        SizedBox(height: h * 0.035),
+
+                        /// 🔹 SEND OTP
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<AuthBloc>().add(SendOtp());
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kPrimaryColor,
+                            padding: EdgeInsets.symmetric(vertical: h * 0.02),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(w * 0.08),
+                            ),
+                          ),
+                          child: const Text(
+                            "SEND OTP",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: h * 0.025),
+
+                        /// 🔹 BACK TO LOGIN
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Remember your password? "),
+                            GestureDetector(
+                              onTap: () => Navigator.pushReplacementNamed(
+                                  context, '/login'),
+                              child: const Text(
+                                "LOGIN",
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -120,11 +172,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildInputField(
-      IconData icon, String hint, TextEditingController controller,
-      {bool obscure = false, TextInputType keyboard = TextInputType.text}) {
+    IconData icon,
+    String hint,
+    TextEditingController controller,
+    double w, {
+    TextInputType keyboard = TextInputType.text,
+  }) {
     return TextField(
       controller: controller,
-      obscureText: obscure,
       keyboardType: keyboard,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: kPrimaryColor),
@@ -132,7 +187,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         filled: true,
         fillColor: kTextFieldBg,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(w * 0.08),
           borderSide: BorderSide.none,
         ),
       ),
