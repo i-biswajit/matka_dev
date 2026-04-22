@@ -1,16 +1,22 @@
-# app
+# matka_dev
 
-A new Flutter project.
+A Flutter application built using the Flutter framework.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project contains the source code for the mobile application.
 
-A few resources to get you started if this is your first Flutter project:
+### Prerequisites
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Before running the project, make sure you have installed:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter SDK
+- Android Studio / VS Code
+- Android SDK
+- Dart SDK
+
+Check Flutter installation:
+
+```bash
+flutter doctor
+```
